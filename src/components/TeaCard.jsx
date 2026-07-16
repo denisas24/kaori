@@ -1,5 +1,5 @@
 import { renderStars } from '../lib/utils.js';
-import { useTheme } from '../lib/theme.js';
+import { useTheme } from '../lib/theme.jsx';
 
 const CATEGORY_COLORS_DARK = {
   green: '#1a2e1a', black: '#221810', white: '#22221a',
