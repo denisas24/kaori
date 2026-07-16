@@ -28,8 +28,8 @@ export default function AuthPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <div className="auth-logo">Steeped</div>
-        <p className="auth-tagline">Track every cup. Share the good ones.</p>
+        <div className="auth-logo">Kaori</div>
+        <p className="auth-tagline">The taste that lingers.</p>
 
         {error && <div className="auth-error">{error}</div>}
         {success && (
@@ -38,14 +38,16 @@ export default function AuthPage() {
           </div>
         )}
 
-        <form onSubmit={submit}>
+        <form onSubmit={submit} autoComplete="off">
+          <input type="text" name="fakeusername" style={{ display: 'none' }} />
+          <input type="password" name="fakepassword" style={{ display: 'none' }} />
           <div className="form-group">
             <label className="form-label">Email</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" />
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="off" name="kaori-email" />
           </div>
           <div className="form-group">
             <label className="form-label">Password</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} />
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="off" name="kaori-password" />
           </div>
           <button className="btn-primary" style={{ width: '100%', marginTop: 8 }} disabled={loading}>
             {loading ? 'Loading…' : mode === 'signin' ? 'Sign in' : 'Create account'}
