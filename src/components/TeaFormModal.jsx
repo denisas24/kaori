@@ -15,6 +15,10 @@ export default function TeaFormModal({ open, onClose, onSaved, entry }) {
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState([]);
   const [saving, setSaving] = useState(false);
+  const [nameSuggestions, setNameSuggestions] = useState([]);
+  const [brandSuggestions, setBrandSuggestions] = useState([]);
+  const [showNameSugg, setShowNameSugg] = useState(false);
+  const [showBrandSugg, setShowBrandSugg] = useState(false);
 
   useEffect(() => {
     if (entry) {
@@ -32,6 +36,22 @@ export default function TeaFormModal({ open, onClose, onSaved, entry }) {
   }, [entry, open]);
 
   if (!open) return null;
+
+  const searchNames = async (q) => {
+    if (!q || q.length < 2) { setNameSuggestions([]); return; }
+    const { data } = await supabase.from('tea_entries').select('name').ilike('name', `%${q}%`).limit(5);
+    const unique = [...new Set((data || []).map(d => d.name))];
+    setNameSuggestions(unique);
+    setShowNameSugg(true);
+  };
+
+  const searchBrands = async (q) => {
+    if (!q || q.length < 2) { setBrandSuggestions([]); return; }
+    const { data } = await supabase.from('tea_entries').select('brand').ilike('brand', `%${q}%`).not('brand', 'is', null).limit(5);
+    const unique = [...new Set((data || []).map(d => d.brand))];
+    setBrandSuggestions(unique);
+    setShowBrandSugg(true);
+  };
 
   const addTag = (e) => {
     if (e.key === 'Enter' && tagInput.trim()) {
@@ -79,13 +99,48 @@ export default function TeaFormModal({ open, onClose, onSaved, entry }) {
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
         <form onSubmit={save}>
-          <div className="form-group">
+          <div className="form-group" style={{ position: 'relative' }}>
             <label className="form-label">Name *</label>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Gyokuro" required />
+            <input
+              value={name}
+              onChange={e => { setName(e.target.value); searchNames(e.target.value); }}
+              onBlur={() => setTimeout(() => setShowNameSugg(false), 150)}
+              placeholder="e.g. Gyokuro"
+              required
+              autoComplete="off"
+            />
+            {showNameSugg && nameSuggestions.length > 0 && (
+              <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', zIndex: 10, overflow: 'hidden' }}>
+                {nameSuggestions.map(s => (
+                  <div key={s} onClick={() => { setName(s); setShowNameSugg(false); }}
+                    style={{ padding: '8px 12px', cursor: 'pointer', fontSize: 14, color: 'var(--text-primary)' }}
+                    onMouseEnter={e => e.target.style.background = 'var(--bg-card)'}
+                    onMouseLeave={e => e.target.style.background = 'transparent'}
+                  >{s}</div>
+                ))}
+              </div>
+            )}
           </div>
-          <div className="form-group">
+          <div className="form-group" style={{ position: 'relative' }}>
             <label className="form-label">Brand</label>
-            <input value={brand} onChange={e => setBrand(e.target.value)} placeholder="e.g. Palais des Thés" />
+            <input
+              value={brand}
+              onChange={e => { setBrand(e.target.value); searchBrands(e.target.value); }}
+              onBlur={() => setTimeout(() => setShowBrandSugg(false), 150)}
+              placeholder="e.g. Palais des Thés"
+              autoComplete="off"
+            />
+            {showBrandSugg && brandSuggestions.length > 0 && (
+              <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', zIndex: 10, overflow: 'hidden' }}>
+                {brandSuggestions.map(s => (
+                  <div key={s} onClick={() => { setBrand(s); setShowBrandSugg(false); }}
+                    style={{ padding: '8px 12px', cursor: 'pointer', fontSize: 14, color: 'var(--text-primary)' }}
+                    onMouseEnter={e => e.target.style.background = 'var(--bg-card)'}
+                    onMouseLeave={e => e.target.style.background = 'transparent'}
+                  >{s}</div>
+                ))}
+              </div>
+            )}
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div className="form-group">
@@ -109,12 +164,13 @@ export default function TeaFormModal({ open, onClose, onSaved, entry }) {
             <textarea value={review} onChange={e => setReview(e.target.value)} rows={3} placeholder="Tasting notes, mood, brewing method…" style={{ resize: 'vertical' }} />
           </div>
           <div className="form-group">
-            <label className="form-label">Flavor tags</label>
+            <label className="form-label">Flavor tags <span style={{ fontWeight: 400, textTransform: 'none', fontSize: 11 }}>(z.B. floral, erdig, süß — Enter drücken)</span></label>
             <input
               value={tagInput}
               onChange={e => setTagInput(e.target.value)}
               onKeyDown={addTag}
               placeholder="Type and press Enter"
+              autoComplete="off"
             />
             {tags.length > 0 && (
               <div className="tag-list">

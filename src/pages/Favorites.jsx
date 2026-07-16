@@ -34,7 +34,7 @@ export default function Favorites() {
       </div>
 
       {loading ? (
-        <div className="tea-grid">
+        <div className="tea-grid-list">
           {Array(6).fill(0).map((_, i) => <div key={i} className="skeleton" style={{ aspectRatio: '2/3', borderRadius: 8 }} />)}
         </div>
       ) : entries.length === 0 ? (
@@ -42,7 +42,7 @@ export default function Favorites() {
           <p>No favorites yet. Open a tea and mark it as a favorite.</p>
         </div>
       ) : (
-        <div className="tea-grid">
+        <div className="tea-grid-list">
           {entries.map(e => <TeaCard key={e.id} entry={e} onClick={setViewEntry} />)}
         </div>
       )}

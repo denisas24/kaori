@@ -70,7 +70,7 @@ export default function Explore() {
       </div>
 
       {loading ? (
-        <div className="tea-grid">
+        <div className="tea-grid-list">
           {Array(8).fill(0).map((_, i) => (
             <div key={i} className="skeleton" style={{ aspectRatio: '2/3', borderRadius: 8 }} />
           ))}
@@ -80,7 +80,7 @@ export default function Explore() {
       ) : (
         <>
           <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>{filtered.length} result{filtered.length !== 1 ? 's' : ''}</p>
-          <div className="tea-grid">
+          <div className="tea-grid-list">
             {filtered.map(e => <TeaCard key={e.id} entry={e} onClick={setViewEntry} />)}
           </div>
         </>

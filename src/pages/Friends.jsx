@@ -145,7 +145,7 @@ export default function Friends() {
                     ) : friendTeas[friendId].length === 0 ? (
                       <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>{p.display_name || 'They'} hasn't logged any teas yet.</p>
                     ) : (
-                      <div className="tea-grid">
+                      <div className="tea-grid-list">
                         {friendTeas[friendId].map(e => <TeaCard key={e.id} entry={e} onClick={setViewEntry} />)}
                       </div>
                     )}
