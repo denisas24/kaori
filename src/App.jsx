@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './lib/auth.jsx';
-import { useTheme } from './lib/theme.js';
+import { useTheme } from './lib/theme.jsx';
 import AuthPage from './pages/AuthPage.jsx';
 import Journal from './pages/Journal.jsx';
 import Explore from './pages/Explore.jsx';
