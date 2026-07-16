@@ -15,12 +15,12 @@ export default function AuthPage() {
     setError(''); setSuccess('');
     setLoading(true);
     if (mode === 'signin') {
-      const { error } = await signIn(email, password);
-      if (error) setError(error.message);
+      const result = await signIn(email, password);
+      if (result.error) setError(result.error.message || 'Sign in failed.');
     } else {
-      const { error } = await signUp(email, password);
-      if (error) setError(error.message);
-      else setSuccess('Check your email to confirm your account.');
+      const result = await signUp(email, password);
+      if (result.error) setError(result.error.message || 'Sign up failed.');
+      else setSuccess('Account created! You can now sign in.');
     }
     setLoading(false);
   };
@@ -39,8 +39,6 @@ export default function AuthPage() {
         )}
 
         <form onSubmit={submit} autoComplete="off">
-          <input type="text" name="fakeusername" style={{ display: 'none' }} />
-          <input type="password" name="fakepassword" style={{ display: 'none' }} />
           <div className="form-group">
             <label className="form-label">Email</label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="off" name="kaori-email" />
