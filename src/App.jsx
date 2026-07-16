@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { useAuth } from './lib/auth.jsx';
 import AuthPage from './pages/AuthPage.jsx';
 import Journal from './pages/Journal.jsx';
@@ -10,6 +11,14 @@ import BottomNav from './components/BottomNav.jsx';
 
 export default function App() {
   const { user, loading } = useAuth();
+  const [theme, setTheme] = useState(() => localStorage.getItem('kaori-theme') || 'dark');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('kaori-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(t => t === 'dark' ? 'light' : 'dark');
 
   if (loading) {
     return (
@@ -23,6 +32,11 @@ export default function App() {
 
   return (
     <div className="app-shell">
+      <div style={{ position: 'fixed', top: 12, right: 16, zIndex: 150 }}>
+        <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
+      </div>
       <main className="main-content">
         <Routes>
           <Route path="/" element={<Navigate to="/journal" replace />} />
