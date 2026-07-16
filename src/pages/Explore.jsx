@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase.js';
 import { useAuth } from '../lib/auth.jsx';
-import { CATEGORIES } from '../lib/utils.js';
+import { CATEGORIES, showToast } from '../lib/utils.js';
 import TeaCard from '../components/TeaCard.jsx';
 import TeaDetailModal from '../components/TeaDetailModal.jsx';
 
 export default function Explore() {
   const { user } = useAuth();
   const [entries, setEntries] = useState([]);
+  const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [scope, setScope] = useState('all');
@@ -16,16 +17,28 @@ export default function Explore() {
   const [viewEntry, setViewEntry] = useState(null);
 
   const load = async () => {
-    const { data } = await supabase
-      .from('tea_entries')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(200);
-    setEntries(data || []);
+    const [{ data: teas }, { data: prof }] = await Promise.all([
+      supabase.from('tea_entries').select('*').order('created_at', { ascending: false }).limit(200),
+      supabase.from('profiles').select('*'),
+    ]);
+    setEntries(teas || []);
+    setProfiles(prof || []);
     setLoading(false);
   };
 
   useEffect(() => { load(); }, []);
+
+  const saveToWishlist = async (entry) => {
+    const author = profiles.find(p => p.id === entry.user_id);
+    const { error } = await supabase.from('wishlist').insert({
+      user_id: user.id,
+      tea_name: entry.name,
+      tea_brand: entry.brand || null,
+      saved_from: author?.display_name || null,
+    });
+    if (error && error.code === '23505') { showToast('Already in wishlist.'); return; }
+    showToast('Saved to wishlist.');
+  };
 
   let filtered = entries.filter(e => {
     if (scope === 'mine' && e.user_id !== user.id) return false;
@@ -70,10 +83,8 @@ export default function Explore() {
       </div>
 
       {loading ? (
-        <div className="tea-grid-list">
-          {Array(8).fill(0).map((_, i) => (
-            <div key={i} className="skeleton" style={{ aspectRatio: '2/3', borderRadius: 8 }} />
-          ))}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {Array(6).fill(0).map((_, i) => <div key={i} className="skeleton" style={{ height: 80, borderRadius: 8 }} />)}
         </div>
       ) : filtered.length === 0 ? (
         <div className="empty-state"><p>No teas found.</p></div>
@@ -81,7 +92,16 @@ export default function Explore() {
         <>
           <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>{filtered.length} result{filtered.length !== 1 ? 's' : ''}</p>
           <div className="tea-grid-list">
-            {filtered.map(e => <TeaCard key={e.id} entry={e} onClick={setViewEntry} />)}
+            {filtered.map(e => (
+              <TeaCard
+                key={e.id}
+                entry={e}
+                onClick={setViewEntry}
+                author={profiles.find(p => p.id === e.user_id)}
+                showAuthor={scope === 'all'}
+                onSaveToWishlist={e.user_id !== user.id ? saveToWishlist : null}
+              />
+            ))}
           </div>
         </>
       )}

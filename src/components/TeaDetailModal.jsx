@@ -12,8 +12,6 @@ export default function TeaDetailModal({ entry, open, onClose, onEdit, onDelete,
 
   if (!open || !entry) return null;
 
-  const emoji = CATEGORY_EMOJI[entry.category] || '🍃';
-
   const toggleFavorite = async () => {
     setToggling(true);
     await supabase.from('tea_entries').update({ favorite: !entry.favorite }).eq('id', entry.id);
@@ -36,28 +34,26 @@ export default function TeaDetailModal({ entry, open, onClose, onEdit, onDelete,
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal">
         <div className="modal-header">
-          <span className="cat-badge">{entry.category || 'tea'}</span>
+          {entry.category && <span className="cat-badge">{entry.category}</span>}
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
 
-        <div style={{ display: 'flex', gap: 16, marginBottom: 20 }}>
-          <div className="detail-poster">
-            {entry.photo_url
-              ? <img src={entry.photo_url} alt={entry.name} />
-              : <span>{emoji}</span>
-            }
-          </div>
-          <div style={{ flex: 1 }}>
-            <h2 style={{ fontSize: 22, marginBottom: 4 }}>{entry.name}</h2>
-            {entry.brand && <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 8 }}>{entry.brand}</p>}
-            <div className="stars" style={{ fontSize: 18 }}>{renderStars(entry.rating)}</div>
-            {entry.date_tried && (
-              <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>
-                {format(new Date(entry.date_tried), 'MMMM d, yyyy')}
-              </p>
-            )}
-          </div>
+        <div style={{ marginBottom: 16 }}>
+          <h2 style={{ fontSize: 24, marginBottom: 4 }}>{entry.name}</h2>
+          {entry.brand && <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 8 }}>{entry.brand}</p>}
+          <div className="stars" style={{ fontSize: 20 }}>{renderStars(entry.rating)}</div>
+          {entry.date_tried && (
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>
+              {format(new Date(entry.date_tried), 'MMMM d, yyyy')}
+            </p>
+          )}
         </div>
+
+        {entry.photo_url && (
+          <div style={{ marginBottom: 16, borderRadius: 'var(--radius)', overflow: 'hidden', maxHeight: 200 }}>
+            <img src={entry.photo_url} alt={entry.name} style={{ width: '100%', objectFit: 'cover' }} />
+          </div>
+        )}
 
         {entry.review && (
           <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 16 }}>
