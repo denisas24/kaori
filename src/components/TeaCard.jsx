@@ -1,62 +1,60 @@
 import { renderStars } from '../lib/utils.js';
-import { useTheme } from '../lib/theme.jsx';
-
-const CATEGORY_COLORS_DARK = {
-  green: '#1a2e1a', black: '#221810', white: '#22221a',
-  oolong: '#22200e', herbal: '#162616', chai: '#261e10',
-  matcha: '#162610', fruit: '#261414', rooibos: '#261810', other: '#1a221a',
-};
-
-const CATEGORY_COLORS_LIGHT = {
-  green: '#e8f0e4', black: '#f0e8dc', white: '#f0f0e4',
-  oolong: '#f0ece0', herbal: '#e4f0e0', chai: '#f0e4d0',
-  matcha: '#e0f0d8', fruit: '#f0e0e0', rooibos: '#f0e4d8', other: '#e8f0e4',
-};
+import { format } from 'date-fns';
 
 export default function TeaCard({ entry, onClick, author, showAuthor, onSaveToWishlist }) {
-  const { theme } = useTheme();
-  const colors = theme === 'dark' ? CATEGORY_COLORS_DARK : CATEGORY_COLORS_LIGHT;
-  const bgColor = colors[entry.category] || (theme === 'dark' ? '#1a221a' : '#e8f0e4');
+  const formattedDate = entry.date_tried
+    ? format(new Date(entry.date_tried), 'MMM d, yyyy')
+    : entry.created_at
+    ? format(new Date(entry.created_at), 'MMM d, yyyy')
+    : null;
+
+  const initials = author?.display_name
+    ? author.display_name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
+    : null;
 
   return (
-    <div
-      className="tea-card-horizontal"
-      onClick={() => onClick(entry)}
-      style={{ backgroundColor: bgColor }}
-    >
-      <div className="tea-card-h-main">
-        <div className="tea-card-h-name">{entry.name}</div>
-        {entry.brand && <div className="tea-card-h-brand">{entry.brand}</div>}
-        <div className="tea-card-h-meta">
-          <span className="stars" style={{ fontSize: 12 }}>{renderStars(entry.rating)}</span>
-          {entry.category && <span className="cat-badge">{entry.category}</span>}
-          {entry.tags?.slice(0,2).map(t => <span key={t} className="tag" style={{ padding: '1px 7px', fontSize: 11 }}>{t}</span>)}
+    <div className="tea-card-horizontal" onClick={() => onClick(entry)}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 4 }}>
+        <div style={{ flex: 1, minWidth: 0, paddingRight: 12 }}>
+          <div className="tea-card-h-name" style={{ fontFamily: 'DM Serif Display, Georgia, serif', fontSize: 17 }}>
+            {entry.name}
+          </div>
+          {entry.brand && (
+            <div style={{ fontSize: 13, color: 'var(--accent)', marginTop: 2 }}>{entry.brand}</div>
+          )}
         </div>
-        {showAuthor && author && (
-          <div style={{ marginTop: 6, fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
-            {author.avatar_url
-              ? <img src={author.avatar_url} style={{ width: 14, height: 14, borderRadius: '50%', objectFit: 'cover' }} alt="" />
-              : <span style={{ width: 14, height: 14, borderRadius: '50%', background: 'var(--bg-elevated)', display: 'inline-block' }} />
-            }
-            {author.display_name || 'Unknown'}
-          </div>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          {entry.category && <span className="cat-badge">{entry.category}</span>}
+          {onSaveToWishlist && (
+            <button
+              style={{ background: 'none', border: 'none', padding: 0, color: 'var(--text-muted)', cursor: 'pointer', lineHeight: 1 }}
+              onClick={e => { e.stopPropagation(); onSaveToWishlist(entry); }}
+              title="Save to wishlist"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, flexShrink: 0 }}>
-        {entry.photo_url && (
-          <div className="tea-card-h-img">
-            <img src={entry.photo_url} alt={entry.name} />
+
+      <div style={{ marginBottom: 8 }}>
+        <span className="stars" style={{ fontSize: 13 }}>{renderStars(entry.rating)}</span>
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{formattedDate}</div>
+        {showAuthor && author && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{author.display_name || ''}</div>
+            <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'var(--bg-elevated)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', fontSize: 10, fontWeight: 600, color: 'var(--text-secondary)', flexShrink: 0 }}>
+              {author.avatar_url
+                ? <img src={author.avatar_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
+                : initials
+              }
+            </div>
           </div>
-        )}
-        {onSaveToWishlist && (
-          <button
-            className="btn-ghost"
-            style={{ padding: '3px 8px', fontSize: 11 }}
-            onClick={e => { e.stopPropagation(); onSaveToWishlist(entry); }}
-            title="Save to wishlist"
-          >
-            + Wishlist
-          </button>
         )}
       </div>
     </div>

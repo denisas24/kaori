@@ -676,3 +676,8 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   flex-direction: column;
   gap: 8px;
 }
+
+/* Karte überschreiben - neutral */
+.tea-card-horizontal {
+  background: var(--bg-card) !important;
+}
