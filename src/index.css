@@ -681,3 +681,9 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .tea-card-horizontal {
   background: var(--bg-card) !important;
 }
+
+/* Karte - mehr Raum */
+.tea-card-horizontal {
+  padding: 16px 18px !important;
+  background: var(--bg-card) !important;
+}
