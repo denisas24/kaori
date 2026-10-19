@@ -14,7 +14,7 @@ export default function TeaGroupRow({ group, onClick }) {
       </div>
       <div className="tea-group-score">
         <span className="stars">{renderStars(Math.round(group.avg * 2) / 2)}</span>
-        <span className="tea-group-count">{count} {count === 1 ? 'rating' : 'ratings'}</span>
+        <span className="tea-group-count">{count}</span>
       </div>
     </div>
   );
