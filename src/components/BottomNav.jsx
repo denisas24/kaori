@@ -38,9 +38,8 @@ export default function BottomNav() {
   return (
     <nav className="bottom-nav">
       {tabs.map(({ to, label, Icon }) => (
-        <NavLink key={to} to={to} className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}>
+        <NavLink key={to} to={to} aria-label={label} title={label} className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}>
           <Icon />
-          {label}
         </NavLink>
       ))}
     </nav>
