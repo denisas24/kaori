@@ -99,7 +99,7 @@ export default function Profile() {
             </div>
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <h1 style={{ fontSize: 22, fontFamily: 'DM Serif Display, serif', fontWeight: 400 }}>
+              <h1 style={{ fontSize: 22, fontFamily: 'var(--font-serif)', fontWeight: 600 }}>
                 {profile?.display_name || <span style={{ color: 'var(--text-muted)', fontSize: 16 }}>No display name</span>}
               </h1>
               <button onClick={() => { setNameInput(profile?.display_name || ''); setEditingName(true); }}
