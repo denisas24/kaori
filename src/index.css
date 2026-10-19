@@ -956,3 +956,14 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .tea-section > .reply-box { margin: 12px 0 4px; }
 .tea-page-header > button { white-space: nowrap; flex-shrink: 0; }
 @media (max-width: 480px) { .tea-page-header > button { padding: 6px 10px; font-size: 11px; } }
+
+/* Star input with half stars */
+.star-input { align-items: center; gap: 2px; }
+.star-slot { position: relative; display: inline-block; width: 28px; height: 28px; line-height: 0; }
+.star-base { color: var(--bg-elevated); display: block; }
+.star-fill svg, .star-base svg { display: block; }
+.star-fill { position: absolute; left: 0; top: 0; height: 100%; overflow: hidden; color: var(--star); }
+.star-input .star-half { position: absolute; top: 0; height: 100%; width: 50%; padding: 0; background: transparent; border: none; cursor: pointer; transform: none; }
+.star-half.left { left: 0; }
+.star-half.right { right: 0; }
+.star-value { margin-left: 10px; font-size: 13px; color: var(--text-muted); min-width: 2em; }
