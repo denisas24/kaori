@@ -1,5 +1,4 @@
 import { renderStars } from '../lib/utils.js';
-import { format } from 'date-fns';
 
 const HeartIcon = ({ filled }) => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -8,24 +7,12 @@ const HeartIcon = ({ filled }) => (
 );
 
 export default function TeaCard({ entry, onClick, author, showAuthor, onSaveToWishlist }) {
-  const rawDate = entry.date_tried || entry.created_at;
-  const date = rawDate ? new Date(rawDate) : null;
-
   const initials = author?.display_name
     ? author.display_name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
     : '?';
 
   return (
     <div className="tea-row" onClick={() => onClick(entry)}>
-      <div className="tea-row-date">
-        {date && (
-          <>
-            <span className="tea-row-month">{format(date, 'MMM')}</span>
-            <span className="tea-row-day">{format(date, 'd')}</span>
-          </>
-        )}
-      </div>
-
       <div className="tea-row-main">
         <div className="tea-row-name">{entry.name}</div>
         <div className="tea-row-meta">
