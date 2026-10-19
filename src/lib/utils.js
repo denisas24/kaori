@@ -9,7 +9,7 @@ export const CATEGORY_EMOJI = {
 export function renderStars(rating) {
   const full = Math.floor(rating);
   const half = rating % 1 >= 0.5;
-  return '★'.repeat(full) + (half ? '½' : '') + '☆'.repeat(5 - full - (half ? 1 : 0));
+  return '★'.repeat(full) + (half ? '½' : '');
 }
 
 let toastTimer = null;
