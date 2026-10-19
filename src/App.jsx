@@ -1,7 +1,8 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './lib/auth.jsx';
 import { useTheme } from './lib/theme.jsx';
 import AuthPage from './pages/AuthPage.jsx';
+import ResetPassword from './pages/ResetPassword.jsx';
 import Journal from './pages/Journal.jsx';
 import Explore from './pages/Explore.jsx';
 import Favorites from './pages/Favorites.jsx';
@@ -33,6 +34,9 @@ const MoonIcon = () => (
 export default function App() {
   const { user, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const location = useLocation();
+
+  if (location.pathname === '/reset-password') return <ResetPassword />;
 
   if (loading) {
     return (
