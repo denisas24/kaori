@@ -9,6 +9,7 @@ import Favorites from './pages/Favorites.jsx';
 import Friends from './pages/Friends.jsx';
 import Profile from './pages/Profile.jsx';
 import Wishlist from './pages/Wishlist.jsx';
+import TeaPage from './pages/TeaPage.jsx';
 import BottomNav from './components/BottomNav.jsx';
 
 const SunIcon = () => (
@@ -60,6 +61,7 @@ export default function App() {
           <Route path="/" element={<Navigate to="/journal" replace />} />
           <Route path="/journal" element={<Journal />} />
           <Route path="/explore" element={<Explore />} />
+          <Route path="/tea/:key" element={<TeaPage />} />
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/friends" element={<Friends />} />
