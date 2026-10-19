@@ -12,21 +12,18 @@ export default function TeaCard({ entry, onClick, author, showAuthor, onSaveToWi
     : '?';
 
   return (
-    <div className="tea-row" onClick={() => onClick(entry)}>
+    <div className={`tea-row${showAuthor ? ' with-author' : ''}`} onClick={() => onClick(entry)}>
+      {showAuthor && (
+        <span className="tea-row-avatar" title={author?.display_name || ''}>
+          {author?.avatar_url ? <img src={author.avatar_url} alt="" /> : initials}
+        </span>
+      )}
       <div className="tea-row-main">
         <div className="tea-row-name">{entry.name}</div>
         <div className="tea-row-meta">
           {entry.brand && <span>{entry.brand}</span>}
           {entry.brand && entry.category && <span className="tea-row-dot">·</span>}
           {entry.category && <span className="tea-row-cat">{entry.category}</span>}
-          {showAuthor && author && (
-            <span className="tea-row-author">
-              <span className="tea-row-avatar">
-                {author.avatar_url ? <img src={author.avatar_url} alt="" /> : initials}
-              </span>
-              {author.display_name}
-            </span>
-          )}
         </div>
       </div>
 
