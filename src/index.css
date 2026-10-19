@@ -749,7 +749,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .tea-row {
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
   column-gap: 14px;
   padding: 12px 6px;
@@ -840,7 +840,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .tea-row-fav { color: var(--accent); width: 23px; height: 23px; display: inline-flex; align-items: center; justify-content: center; }
 
 @media (max-width: 420px) {
-  .tea-row { column-gap: 10px; grid-template-columns: 34px minmax(0, 1fr) auto auto; }
+  .tea-row { column-gap: 10px; }
   .tea-row-rating { min-width: 0; font-size: 13px; }
 }
 
