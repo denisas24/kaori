@@ -1,55 +1,42 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase.js';
 import { useAuth } from '../lib/auth.jsx';
-import { CATEGORIES, showToast } from '../lib/utils.js';
-import TeaCard from '../components/TeaCard.jsx';
-import TeaDetailModal from '../components/TeaDetailModal.jsx';
+import { useNavigate } from 'react-router-dom';
+import { CATEGORIES, groupTeas } from '../lib/utils.js';
+import TeaGroupRow from '../components/TeaGroupRow.jsx';
 
 export default function Explore() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [entries, setEntries] = useState([]);
-  const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [scope, setScope] = useState('all');
   const [filterCat, setFilterCat] = useState('all');
   const [sortOrder, setSortOrder] = useState(null);
-  const [viewEntry, setViewEntry] = useState(null);
 
   const load = async () => {
-    const [{ data: teas }, { data: prof }] = await Promise.all([
-      supabase.from('tea_entries').select('*').order('created_at', { ascending: false }).limit(200),
-      supabase.from('profiles').select('*'),
-    ]);
+    const { data: teas } = await supabase.from('tea_entries').select('*').order('created_at', { ascending: false }).limit(1000);
     setEntries(teas || []);
-    setProfiles(prof || []);
     setLoading(false);
   };
 
   useEffect(() => { load(); }, []);
 
-  const saveToWishlist = async (entry) => {
-    const author = profiles.find(p => p.id === entry.user_id);
-    const { error } = await supabase.from('wishlist').insert({
-      user_id: user.id,
-      tea_name: entry.name,
-      tea_brand: entry.brand || null,
-      saved_from: author?.display_name || null,
-    });
-    if (error && error.code === '23505') { showToast('Already in wishlist.'); return; }
-    showToast('Saved to wishlist.');
-  };
-
-  let filtered = entries.filter(e => {
-    if (scope === 'mine' && e.user_id !== user.id) return false;
-    const q = search.toLowerCase();
-    const matchSearch = !search || e.name?.toLowerCase().includes(q) || e.brand?.toLowerCase().includes(q) || e.review?.toLowerCase().includes(q);
-    const matchCat = filterCat === 'all' || e.category === filterCat;
+  const q = search.toLowerCase();
+  let groups = groupTeas(entries).filter(g => {
+    if (scope === 'mine' && !g.entries.some(e => e.user_id === user.id)) return false;
+    const matchSearch = !search
+      || g.name?.toLowerCase().includes(q)
+      || g.brand?.toLowerCase().includes(q)
+      || g.entries.some(e => e.review?.toLowerCase().includes(q));
+    const matchCat = filterCat === 'all' || g.category === filterCat;
     return matchSearch && matchCat;
   });
 
-  if (sortOrder === 'best') filtered = [...filtered].sort((a, b) => (b.rating || 0) - (a.rating || 0));
-  if (sortOrder === 'worst') filtered = [...filtered].sort((a, b) => (a.rating || 0) - (b.rating || 0));
+  if (sortOrder === 'best') groups = [...groups].sort((a, b) => b.avg - a.avg);
+  else if (sortOrder === 'worst') groups = [...groups].sort((a, b) => a.avg - b.avg);
+  else groups = [...groups].sort((a, b) => (b.latest > a.latest ? 1 : -1));
 
   return (
     <div>
@@ -84,36 +71,20 @@ export default function Explore() {
 
       {loading ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {Array(6).fill(0).map((_, i) => <div key={i} className="skeleton" style={{ height: 80, borderRadius: 8 }} />)}
+          {Array(6).fill(0).map((_, i) => <div key={i} className="skeleton" style={{ height: 64, borderRadius: 4 }} />)}
         </div>
-      ) : filtered.length === 0 ? (
+      ) : groups.length === 0 ? (
         <div className="empty-state"><p>No teas found.</p></div>
       ) : (
         <>
-          <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>{filtered.length} result{filtered.length !== 1 ? 's' : ''}</p>
+          <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>{groups.length} {groups.length === 1 ? 'tea' : 'teas'}</p>
           <div className="tea-grid-list">
-            {filtered.map(e => (
-              <TeaCard
-                key={e.id}
-                entry={e}
-                onClick={setViewEntry}
-                author={profiles.find(p => p.id === e.user_id)}
-                showAuthor={scope === 'all'}
-                onSaveToWishlist={e.user_id !== user.id ? saveToWishlist : null}
-              />
+            {groups.map(g => (
+              <TeaGroupRow key={g.key} group={g} onClick={() => navigate(`/tea/${encodeURIComponent(g.key)}`)} />
             ))}
           </div>
         </>
       )}
-
-      <TeaDetailModal
-        entry={viewEntry}
-        open={!!viewEntry}
-        onClose={() => setViewEntry(null)}
-        canEdit={viewEntry?.user_id === user.id}
-        onEdit={() => {}}
-        onDelete={load}
-      />
     </div>
   );
 }
