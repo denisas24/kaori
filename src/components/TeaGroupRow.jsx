@@ -1,7 +1,6 @@
 import { renderStars } from '../lib/utils.js';
 
 export default function TeaGroupRow({ group, onClick }) {
-  const count = group.entries.length;
   return (
     <div className="tea-row tea-group-row" onClick={() => onClick(group)}>
       <div className="tea-row-main">
@@ -14,7 +13,6 @@ export default function TeaGroupRow({ group, onClick }) {
       </div>
       <div className="tea-group-score">
         <span className="stars">{renderStars(Math.round(group.avg * 2) / 2)}</span>
-        <span className="tea-group-count">{count}</span>
       </div>
     </div>
   );
